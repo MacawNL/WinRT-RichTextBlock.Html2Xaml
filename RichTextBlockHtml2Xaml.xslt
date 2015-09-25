@@ -13,7 +13,7 @@
       <RichTextBlock>
         <RichTextBlock.Resources>
           <Style x:Key="Bullet" TargetType="Ellipse">
-            <Setter Property="Fill" Value="White" />
+            <Setter Property="Fill" Value="Black" />
             <Setter Property="Width" Value="6" />
             <Setter Property="Height" Value="6" />
             <Setter Property="Margin" Value="-30,0,0,1" />
@@ -33,14 +33,40 @@
     <xsl:template match="div" priority="0">
       <Span><xsl:apply-templates /></Span>
     </xsl:template>
+
   
     <!-- XAML Paragraphs cannot contain paragraphs, so we convert top-level html paragraphs to xaml paragraphs and convert nested html paragraphs to xaml spans with linebreaks -->
     <xsl:template match="/div/P | /div/p" priority="9">
-      <Paragraph><xsl:apply-templates /></Paragraph>
+      <Paragraph>
+        <xsl:if test="@font-color">
+          <xsl:attribute name="Foreground">
+            <xsl:value-of select="@font-color"/>
+          </xsl:attribute>
+        </xsl:if>
+        <xsl:apply-templates />
+      </Paragraph>
     </xsl:template>
     <xsl:template match="P | p" priority="0">
-      <Span><LineBreak /><xsl:apply-templates /><LineBreak /></Span>
+      <Span>
+        <xsl:if test="@font-color">
+          <xsl:attribute name="Foreground">
+            <xsl:value-of select="@font-color"/>
+          </xsl:attribute>
+        </xsl:if>
+        <LineBreak /><xsl:apply-templates /><LineBreak />
+      </Span>
     </xsl:template>
+
+  <xsl:template match="SPAN | span">
+    <Span>
+      <xsl:if test="@font-color">
+        <xsl:attribute name="Foreground">
+          <xsl:value-of select="@font-color"/>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:apply-templates/>
+    </Span>
+  </xsl:template>
   
     <!-- The RichTextBlock XAML element can contain only paragraph child elements, so any unknown html child elements of the root element will become XAML paragraphs -->
     <xsl:template match="/div/*">
